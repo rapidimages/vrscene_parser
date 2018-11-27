@@ -13,11 +13,11 @@ namespace vrp {
     template<class T> using Maybe = std::optional<T>;
 
     struct Include : public std::string {
-    using std::string::string;
+        using std::string::string;
     };
 
     struct Comment : public std::string {
-    using std::string::string;
+        using std::string::string;
     };
 
     using Identifier = std::string;
@@ -28,6 +28,7 @@ namespace vrp {
     };
 
     struct Function;
+
     using Value = std::variant<AttributeSelector, Function, Identifier, int64_t, double_t, std::string_view>;
 
     struct Function {
@@ -65,8 +66,8 @@ namespace vrp {
     }
 
     inline bool try_consume(std::string_view& string, std::string_view token, bool trim = true) noexcept {
-        if (trim) trim_leading_whitespace(string);
-        if (!match(string, token)) return false;
+        if(trim) trim_leading_whitespace(string);
+        if(!match(string, token)) return false;
         string.remove_prefix(token.size());
         return true;
     }
@@ -84,7 +85,7 @@ namespace vrp {
     }
 
     inline Maybe<Include> parse_include(std::string_view& string) {
-        if (!try_consume(string, "#include")){
+        if(!try_consume(string, "#include")){
             return {};
         }
         trim_leading_whitespace(string);
@@ -94,7 +95,7 @@ namespace vrp {
 
     inline Maybe<Comment> parse_comment(std::string_view& source) {
         trim_leading_whitespace(source);
-        if (!match(source, "//")) return {};
+        if(!match(source, "//")) return {};
 
         auto eol = source.find('\n');
         auto comment = source.substr(0, eol);
@@ -149,15 +150,15 @@ namespace vrp {
     Maybe<Value> parse_function(std::string_view& src);
 
     inline Maybe<Value> parse_value(std::string_view& src) {
-        if (auto n = parse_number(src)) {
+        if(auto n = parse_number(src)) {
             return *n;
-        } else if (auto s = parse_qouted_string(src)) {
+        } else if(auto s = parse_qouted_string(src)) {
             return *s;
-        } else if (auto f = parse_function(src)) {
+        } else if(auto f = parse_function(src)) {
             return *f;
-        } else if (auto as = parse_attribute_selector(src)) {
+        } else if(auto as = parse_attribute_selector(src)) {
             return *as;
-        }else if (auto i = parse_identifier(src)) {
+        }else if(auto i = parse_identifier(src)) {
             return *i;
         } else {
             return {};
@@ -188,7 +189,7 @@ namespace vrp {
     inline Maybe<Plugin> parse_plugin(std::string_view& src) {
         auto type = parse_identifier(src);
         auto name = parse_identifier(src);
-        if (!(type && name)) return {};
+        if(!(type && name)) return {};
 
         auto begin = src.find('{');
         src.remove_prefix(begin + 1);
@@ -218,7 +219,7 @@ namespace vrp {
         while(!source.empty()) {
             if(auto comment = parse_comment(source); comment) {
                 scene.comments.push_back(*comment);
-            } else if (auto import = parse_include(source); import) {
+            } else if(auto import = parse_include(source); import) {
                 scene.includes.push_back(*import);
             } else if(auto plugin = parse_plugin(source); plugin) {
                 scene.plugins.push_back(*plugin);
@@ -240,7 +241,7 @@ namespace vrp {
     }
 
     std::ostream& operator<<(std::ostream& os, const Value& v) {
-        if (auto str = std::get_if<std::string_view>(&v)) {
+        if(auto str = std::get_if<std::string_view>(&v)) {
             return os << '"' << *str << '"';
         }
         std::visit([&os](auto const& e){ os << e; }, v);

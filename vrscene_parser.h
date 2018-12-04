@@ -129,7 +129,7 @@ namespace vrp {
         char *ds = nullptr, *is=nullptr;
         const auto pos = &src[0];
         auto d = Value(std::strtod(pos, &ds));
-        auto i = Value(std::strtoll(pos, &is, 10));
+        auto i = Value(static_cast<int64_t>(std::strtoll(pos, &is, 10)));
         if(ds == pos && is == pos) return {};
         src.remove_prefix((ds > is ? ds : is) - pos);
         return ds > is ? std::make_optional(d) : std::make_optional(i);

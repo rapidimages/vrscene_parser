@@ -43,7 +43,7 @@ namespace vrp {
     struct Plugin {
         std::string name;
         std::string type;
-        std::vector<std::pair<Identifier, Value>> attributes;
+        std::map<Identifier, Value> attributes;
     };
 
     struct Vrscene {
@@ -52,6 +52,22 @@ namespace vrp {
         std::vector<Plugin> plugins;
         std::string source;
     };
+
+    std::ostream& operator<<(std::ostream& os, const Comment& c);
+
+    std::ostream& operator<<(std::ostream& os, const Include& inc);
+
+    std::ostream& operator<<(std::ostream& os, const Value& v);
+
+    std::ostream& operator<<(std::ostream& os, const Function& f);
+
+    std::ostream& operator<<(std::ostream& os, const AttributeSelector& as);
+
+    std::ostream& operator<<(std::ostream& os, const Plugin& p);
+
+    std::ostream& operator<<(std::ostream& stream, const Vrscene& s);
+
+#ifdef VRSCENE_PARSER_IMPL
 
     inline void trim_leading_whitespace(std::string_view& string) noexcept {
         while(!string.empty() && std::isspace(string.front())) string.remove_prefix(1);
@@ -205,7 +221,7 @@ namespace vrp {
             auto val = parse_value(src);
             if(!val) return {};
             if(!try_consume(src, ";")) return {};
-            p.attributes.push_back(std::make_pair(*id, *val));
+            p.attributes[*id] = *val;
         }
 
         return p;
@@ -270,5 +286,14 @@ namespace vrp {
         }
         return os << "}";
     }
+
+    std::ostream& operator<<(std::ostream& stream, const Vrscene& s) {
+        for(auto& p : s.plugins) {
+            stream << p << "\n";
+        }
+        return stream;
+    }
+
+#endif // VRSCENE_PARSER_IMPL
 
 } // namespace vrp

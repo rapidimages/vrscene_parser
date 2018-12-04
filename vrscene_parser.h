@@ -240,6 +240,10 @@ namespace vrp {
         return os << "#include \"" << std::string_view(inc) << "\"\n";
     }
 
+    inline std::ostream& operator<<(std::ostream& os, const AttributeSelector& as) {
+        return os << as.plugin << "::" << as.attribute;
+    }
+
     inline std::ostream& operator<<(std::ostream& os, const Value& v) {
         if(auto str = std::get_if<std::string_view>(&v)) {
             return os << '"' << *str << '"';
@@ -259,23 +263,20 @@ namespace vrp {
         return os << ')';
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const AttributeSelector& as) {
-        return os << as.plugin << "::" << as.attribute;
-    }
 
     inline std::ostream& operator<<(std::ostream& os, const Plugin& p) {
         os << p.type << " " << p.name << " {\n";
         for(auto&& a : p.attributes) {
-            std::cout << "  " << a.first << "=" << a.second << ";\n";
+            os << "  " << a.first << "=" << a.second << ";\n";
         }
         return os << "}";
     }
 
-    inline std::ostream& operator<<(std::ostream& stream, const Vrscene& s) {
-        for(auto& p : s.plugins) {
-            stream << p << "\n";
+    inline std::ostream& operator<<(std::ostream& os, const Vrscene& s) {
+        for(auto&& p : s.plugins) {
+            os << p << "\n\n";
         }
-        return stream;
+        return os;
     }
 
 } // namespace vrp

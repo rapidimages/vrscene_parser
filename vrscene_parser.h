@@ -53,22 +53,6 @@ namespace vrp {
         std::string source;
     };
 
-    std::ostream& operator<<(std::ostream& os, const Comment& c);
-
-    std::ostream& operator<<(std::ostream& os, const Include& inc);
-
-    std::ostream& operator<<(std::ostream& os, const Value& v);
-
-    std::ostream& operator<<(std::ostream& os, const Function& f);
-
-    std::ostream& operator<<(std::ostream& os, const AttributeSelector& as);
-
-    std::ostream& operator<<(std::ostream& os, const Plugin& p);
-
-    std::ostream& operator<<(std::ostream& stream, const Vrscene& s);
-
-#ifdef VRSCENE_PARSER_IMPL
-
     inline void trim_leading_whitespace(std::string_view& string) noexcept {
         while(!string.empty() && std::isspace(string.front())) string.remove_prefix(1);
     }
@@ -248,15 +232,15 @@ namespace vrp {
         return scene;
     }
 
-    std::ostream& operator<<(std::ostream& os, const Comment& c) {
+    inline std::ostream& operator<<(std::ostream& os, const Comment& c) {
         return os << std::string_view(c) << '\n';
     }
 
-    std::ostream& operator<<(std::ostream& os, const Include& inc) {
+    inline std::ostream& operator<<(std::ostream& os, const Include& inc) {
         return os << "#include \"" << std::string_view(inc) << "\"\n";
     }
 
-    std::ostream& operator<<(std::ostream& os, const Value& v) {
+    inline std::ostream& operator<<(std::ostream& os, const Value& v) {
         if(auto str = std::get_if<std::string_view>(&v)) {
             return os << '"' << *str << '"';
         }
@@ -264,7 +248,7 @@ namespace vrp {
         return os;
     }
 
-    std::ostream& operator<<(std::ostream& os, const Function& f) {
+    inline std::ostream& operator<<(std::ostream& os, const Function& f) {
         os << f.name << '(';
         auto first = true;
         for(auto&& a: f.arguments) {
@@ -275,11 +259,11 @@ namespace vrp {
         return os << ')';
     }
 
-    std::ostream& operator<<(std::ostream& os, const AttributeSelector& as) {
+    inline std::ostream& operator<<(std::ostream& os, const AttributeSelector& as) {
         return os << as.plugin << "::" << as.attribute;
     }
 
-    std::ostream& operator<<(std::ostream& os, const Plugin& p) {
+    inline std::ostream& operator<<(std::ostream& os, const Plugin& p) {
         os << p.type << " " << p.name << " {\n";
         for(auto&& a : p.attributes) {
             std::cout << "  " << a.first << "=" << a.second << ";\n";
@@ -287,13 +271,11 @@ namespace vrp {
         return os << "}";
     }
 
-    std::ostream& operator<<(std::ostream& stream, const Vrscene& s) {
+    inline std::ostream& operator<<(std::ostream& stream, const Vrscene& s) {
         for(auto& p : s.plugins) {
             stream << p << "\n";
         }
         return stream;
     }
-
-#endif // VRSCENE_PARSER_IMPL
 
 } // namespace vrp

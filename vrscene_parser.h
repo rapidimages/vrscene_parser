@@ -240,29 +240,24 @@ namespace vrp {
         return os << "#include \"" << std::string_view(inc) << "\"\n";
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const AttributeSelector& as) {
-        return os << as.plugin << "::" << as.attribute;
-    }
-
     inline std::ostream& operator<<(std::ostream& os, const Value& v) {
         if(auto str = std::get_if<std::string_view>(&v)) {
             return os << '"' << *str << '"';
+        } else if(auto as = std::get_if<AttributeSelector>(&v)) {
+            return os << as->plugin << "::" << as->attribute;
+        } else if(auto f = std::get_if<Function>(&v)) {
+            os << f->name << '(';
+            auto first = true;
+            for(auto&& a: f->arguments) {
+                if(!first) os << ',';
+                first = false;
+                os << a;
+            }
+            return os << ')';
         }
         std::visit([&os](auto const& e){ os << e; }, v);
         return os;
     }
-
-    inline std::ostream& operator<<(std::ostream& os, const Function& f) {
-        os << f.name << '(';
-        auto first = true;
-        for(auto&& a: f.arguments) {
-            if(!first) os << ',';
-            first = false;
-            os << a;
-        }
-        return os << ')';
-    }
-
 
     inline std::ostream& operator<<(std::ostream& os, const Plugin& p) {
         os << p.type << " " << p.name << " {\n";

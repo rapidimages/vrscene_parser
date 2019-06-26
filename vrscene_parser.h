@@ -2,6 +2,9 @@
 #include <cstdlib>
 #include <cctype>
 #include <iostream>
+#include <math.h>
+#include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -50,7 +53,7 @@ namespace vrp {
         std::vector<Include> includes;
         std::vector<Comment> comments;
         std::vector<Plugin> plugins;
-        std::string source;
+        std::shared_ptr<std::string> source;
     };
 
     inline void trim_leading_whitespace(std::string_view& string) noexcept {
@@ -212,9 +215,9 @@ namespace vrp {
     }
 
     inline Maybe<Vrscene> parse_vrscene(const std::string& src) {
-        std::string_view source = src;
         Vrscene scene;
-        scene.source = std::move(src);
+        scene.source = std::make_shared<std::string>(src);
+        std::string_view source(*scene.source);
 
         while(!source.empty()) {
             if(auto comment = parse_comment(source); comment) {
